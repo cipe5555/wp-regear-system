@@ -51,7 +51,7 @@ class RegearAgent:
 
         # Open the sheets
         spreadsheet = client.open_by_url(self.SHEET_URL)
-        form_data_sheet = spreadsheet.worksheet("Form Data")
+        members_data_sheet = spreadsheet.worksheet("Members")
         raw_data_sheet = spreadsheet.worksheet("Raw")
         raw_items_sheet = spreadsheet.worksheet("RawItems")
         statistics_sheet = spreadsheet.worksheet("Statistics")
@@ -61,8 +61,13 @@ class RegearAgent:
         item_name_map = {row["Unique Item Name"]: row["Base Item Name"] for row in raw_items_data if row["Unique Item Name"]}
 
         # Fetch player names from "Form Data" sheet
-        form_data = form_data_sheet.get_all_records()
-        player_names = {row["Username"].strip().lower() for row in form_data if row["Username"].strip()}
+        form_data = members_data_sheet.get_all_records()
+        player_names = {
+            str(row["Guild Members"]).strip().lower()
+            for row in form_data 
+            if isinstance(row.get("Guild Members"), str) and row["Guild Members"].strip()
+        }
+
 
         # Ensure "Raw" sheet has a header
         header = [
