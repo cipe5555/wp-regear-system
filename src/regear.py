@@ -100,6 +100,14 @@ class RegearAgent:
                 item_counts[item_full_name] += 1
                 
                 return item_full_name
+            else:
+                localized_name = item_name_map.get(unique_name, "")
+                item_full_name = f"{localized_name} - {quality_label}"
+
+                item_counts[item_full_name] += 1
+
+                return item_full_name
+
 
             return f"{unique_name} - {quality_label}"
 
