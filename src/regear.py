@@ -167,8 +167,22 @@ class RegearAgent:
         statistics_sheet.clear()  # Clear existing data
         statistics_sheet.append_row(["Item Name", "Count"])
 
-        # Sort item counts and write in batch
-        statistics_data = sorted(item_counts.items())  # Sort by item name
-        statistics_sheet.append_rows(statistics_data)
+        # Dictionary to store combined item counts (ignoring quality levels)
+        combined_counts = defaultdict(int)
+
+        # Process item counts
+        for item_name, count in item_counts.items():
+            if any(q in item_name for q in ["無", "鉄"]):  # Skip filtered items
+                continue
+
+            # Extract base name (removing quality suffix)
+            base_name = re.sub(r" - .*", "", item_name)  # Removes " - QualityLabel"
+            combined_counts[base_name] += count  # Combine counts
+
+        # Convert to sorted list and write in batch
+        sorted_statistics_data = sorted(combined_counts.items())  # Sort by item name
+
+        if sorted_statistics_data:
+            statistics_sheet.append_rows(sorted_statistics_data)
 
         print("Statistics updated successfully!")
