@@ -10,7 +10,7 @@ guild_members_agent = GuildMembersAgent()
 raw_items_agent = RawItemsAgent()
 
 # Streamlit UI
-st.title("WP 補裝系統v2.2")
+st.title("WP 補裝系統v2.3")
 
 # Time selection inputs
 st.subheader("選擇開始與結束時間")
