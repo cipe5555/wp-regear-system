@@ -13,7 +13,7 @@ class RegearSortingAgent:
 
     def __init__(self):
         self.discord_bot_path = "src/discord_bot.py"
-        self.fastapi_url = "http://127.0.0.1:8000/docs"
+        self.fastapi_url = "http://127.0.0.1:5000/docs"
 
     def start_fastapi(self):
         """Start FastAPI server if not running"""

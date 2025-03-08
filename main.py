@@ -98,7 +98,7 @@ elif page == "補裝整理":
         thread_id = regear_sorting_agent.extract_thread_id(discord_url)
 
         if thread_id:
-            response = requests.get(f"http://127.0.0.1:8000/read_messages/{thread_id}")
+            response = requests.get(f"http://127.0.0.1:5000/read_messages/{thread_id}")
 
             if response.status_code == 200:
                 messages = response.json().get("messages", [])
