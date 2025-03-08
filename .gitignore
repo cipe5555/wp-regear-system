@@ -170,3 +170,6 @@ cython_debug/
 # PyPI configuration file
 .pypirc
 items.py
+testing.py
+testing2.py
+OC.xlsx
