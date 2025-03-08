@@ -2,10 +2,18 @@ import streamlit as st
 from datetime import datetime, timedelta
 import requests
 import re
+import subprocess
+import time
+import os
+import threading
 
 from src.regear import RegearAgent
 from src.guild_members import GuildMembersAgent
 from src.raw_items import RawItemsAgent
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 # Initialize Agents
 regear_agent = RegearAgent()
@@ -23,6 +31,26 @@ st.markdown("""
 # Sidebar navigation (custom)
 st.sidebar.title("導航")
 page = st.sidebar.radio("選擇頁面", ["首頁", "補裝整理"])
+
+
+# Start Discord bot as a background process
+def start_discord_bot():
+    """Start Discord bot as a separate process if not running."""
+    discord_bot_path = "src/discord_bot.py"
+    
+    try:
+        process = subprocess.Popen(["python", discord_bot_path], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        time.sleep(3)  # Allow time for bot startup
+        return process
+    except Exception as e:
+        print(f"Error starting Discord bot: {e}")
+        return None
+
+
+# Run the bot on a separate thread
+bot_thread = threading.Thread(target=start_discord_bot, daemon=True)
+bot_thread.start()
+
 
 if page == "首頁":
     st.title("WP 補裝系統 v3.0")
@@ -87,18 +115,16 @@ if page == "首頁":
 elif page == "補裝整理":
     st.title("補裝整理 🔄")
     
-    from src.regear_sorter import RegearSortingAgent
-    regear_sorting_agent = RegearSortingAgent()
-    regear_sorting_agent.start_fastapi()  # Ensure FastAPI server is running before making API calls
-
     # Input Discord URL
     discord_url = st.text_input("Enter Discord Thread URL:", "")
 
     if st.button("Read Messages"):
-        thread_id = regear_sorting_agent.extract_thread_id(discord_url)
+        # Extract thread ID from URL
+        match = re.search(r"discord\.com/channels/\d+/(\d+)", discord_url)
+        thread_id = match.group(1) if match else None
 
         if thread_id:
-            response = requests.get(f"http://127.0.0.1:5000/read_messages/{thread_id}")
+            response = requests.get(f"http://127.0.0.1:8000/read_messages/{thread_id}")
 
             if response.status_code == 200:
                 messages = response.json().get("messages", [])
@@ -123,7 +149,6 @@ elif page == "補裝整理":
                         nickname_display = msg['nickname'] if msg['nickname'] else "No Nickname"
                         st.write(f"**Nickname:** {nickname_display}")
                         st.write(f"**Message:** {msg['content']}")
-                        # st.write(f"**Timestamp:** {msg['timestamp']}")
 
                         # Display images if available
                         if msg["image_urls"]:
@@ -131,7 +156,6 @@ elif page == "補裝整理":
                                 st.image(img_url, use_column_width=True)
 
                         st.markdown("---")  # Separator for readability
-
 
             else:
                 st.error("Error fetching messages.")
