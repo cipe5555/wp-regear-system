@@ -124,7 +124,7 @@ elif page == "補裝整理":
         thread_id = match.group(1) if match else None
 
         if thread_id:
-            response = requests.get(f"http://127.0.0.1:8000/read_messages/{thread_id}")
+            response = requests.get(f"https://discord-message-reader.onrender.com/read_messages/{thread_id}")
 
             if response.status_code == 200:
                 messages = response.json().get("messages", [])
