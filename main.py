@@ -6,6 +6,7 @@ import subprocess
 import time
 import os
 import threading
+import aiohttp
 
 from src.regear import RegearAgent
 from src.guild_members import GuildMembersAgent
@@ -33,27 +34,8 @@ st.sidebar.title("導航")
 page = st.sidebar.radio("選擇頁面", ["首頁", "補裝整理"])
 
 
-# Start Discord bot as a background process
-def start_discord_bot():
-    """Start Discord bot as a separate process if not running."""
-    discord_bot_path = "src/discord_bot.py"
-    
-    try:
-        process = subprocess.Popen(["python", discord_bot_path], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        time.sleep(3)  # Allow time for bot startup
-        return process
-    except Exception as e:
-        print(f"Error starting Discord bot: {e}")
-        return None
-
-
-# Run the bot on a separate thread
-bot_thread = threading.Thread(target=start_discord_bot, daemon=True)
-bot_thread.start()
-
-
 if page == "首頁":
-    st.title("WP 補裝系統 v3.0")
+    st.title("WP 補裝系統 v4.0")
 
     # Time selection inputs
     st.subheader("選擇開始與結束時間")
@@ -120,7 +102,7 @@ elif page == "補裝整理":
 
     if st.button("Read Messages"):
         # Extract thread ID from URL
-        match = re.search(r"discord\.com/channels/\d+/(\d+)", discord_url)
+        match = re.search(r"https?://(?:discord|discordapp)\.com/channels/\d+/(\d+)", discord_url)
         thread_id = match.group(1) if match else None
 
         if thread_id:
